@@ -1,0 +1,86 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df1 = pd.read_csv('heart.csv')
+df2 = pd.read_csv('AirQuality.csv',sep=';')
+
+# a.data cleaning
+df1.head()
+
+print(df1.isnull().sum())
+
+print(df1.shape)
+
+df1 = df1.drop(['target'], axis=1)
+
+df1.head()
+
+print(df2.isnull().sum())
+
+#Removing duplicates
+df2.dropna(inplace=True) 
+df2.drop_duplicates(inplace=True)
+df2.head()
+
+# b.Data integration
+merged_df = pd.merge(df1, df2,left_index=True, right_index=True)
+merged_df.head()
+
+#*****************************************************************************
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df1 = pd.read_csv('heart.csv')
+df2 = pd.read_csv('AirQuality.csv',sep=';')
+
+merged_df = pd.merge(df1, df2,left_index=True, right_index=True)
+merged_df.head()
+
+# a.data transformation
+columns_to_drop = ['sex', 'cp','fbs']
+transformed_df = df1.drop(columns_to_drop, axis=1)
+transformed_df.head()
+
+#b.error correcting
+correctdf = df1.drop(['sex','cp','ca','thal'],axis=1)
+correctdf
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+#e.Data model building
+X = df1.drop('age', axis=1)
+y = df1['age']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+# Scale the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+from sklearn.impute import SimpleImputer
+imputer = SimpleImputer(strategy='mean')  # or 'median', 'most_frequent', etc.
+X_train_imputed = imputer.fit_transform(X_train_scaled)
+X_test_imputed = imputer.fit_transform(X_test_scaled)
+
+X_train.head()
+
+
+model = LogisticRegression()
+model.fit(X_train_imputed, y_train)
+
+accuracy = model.score(X_test_imputed, y_test)
+print("Accuracy:", accuracy)
+
+from sklearn.metrics import confusion_matrix
+
+output = model.predict(X_test_imputed)
+
+cm = confusion_matrix(y_test, output)
+
+print(cm)

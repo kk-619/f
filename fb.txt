@@ -1,0 +1,50 @@
+# Necessary Liabraries
+import pandas as pd
+import numpy as np
+
+# Read Dataset
+df=pd.read_csv('dataset_Facebook.csv',sep=';')
+df
+
+# a.Create Data Subset1
+df_subset1=df.loc[0:4,['like','share']]
+df_subset1.head()
+
+# a.Create Data Subset2
+df_subset2=df.iloc[0:5,[16,17]]
+df_subset2.head()
+
+# b.Merge Datasets
+df1 = df[['Type', 'Category', 'comment']].loc[4:17]
+df2 = df[['Type', 'Category', 'Paid']].loc[24:30]
+df3 = df[['Type', 'Category', 'Paid']].loc[31:35]
+merge=pd.concat([df1, df2, df3])
+merge
+
+# c.Transposing Data
+trans=df.transpose()
+trans
+
+#*****************************************************************************
+
+# a.Create Data Subset1
+df_subset1=df.loc[0:4,['like','share']]
+df_subset1.head()
+
+# a.Create Data Subset2
+df_subset2=df.iloc[0:5,[16,17]]
+df_subset2.head()
+
+# b.Sort Data
+sorted=df.sort_values('Page total likes', ascending = False)
+sorted
+
+# c.Shape & Reshape Data
+shape=df.shape
+shape
+
+#reshape
+reshape=pd.pivot_table(df, index=['Type', 'Category', 'Paid'], values=['like', 'comment'])
+reshape
+
+

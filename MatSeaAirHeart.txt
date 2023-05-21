@@ -1,0 +1,90 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df1 = pd.read_csv('heart.csv')
+df2 = pd.read_csv('AirQuality.csv',sep=';')
+
+# a. Data cleaning
+new_df1 = df1.drop("Fbs", axis=1)
+new_df1
+
+# a. Data cleaning
+new_df2 = df2.drop("RH", axis=1)
+new_df2
+
+# b.Data integration
+df = pd.merge(new_df1, new_df2,left_index=True, right_index=True)
+
+df.head()
+
+df.tail()
+
+#*****************************************************************************
+
+# a.data transformation
+columns_to_drop = ['RestBP', 'MaxHR','Slope']
+transformed_df = df.drop(columns_to_drop, axis=1)
+transformed_df.head()
+
+#b.error correcting
+duplicated_rows = df.duplicated()
+df = df.drop_duplicates()
+df.head()
+
+#c.Data model building
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+X = df1.drop('RestECG', axis=1)
+y = df1['RestECG']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Scale the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+from sklearn.impute import SimpleImputer
+imputer = SimpleImputer(strategy='mean')  # or 'median', 'most_frequent', etc.
+X_train_imputed = imputer.fit_transform(X_train_scaled)
+X_test_imputed = imputer.fit_transform(X_test_scaled)
+X_train.head()
+
+model = LogisticRegression()
+model.fit(X_train_imputed, y_train)
+
+accuracy = model.score(X_test_imputed, y_test)
+print("Accuracy:", accuracy)
+
+from sklearn.metrics import confusion_matrix
+output = model.predict(X_test_imputed)
+cm = confusion_matrix(y_test, output)
+print(cm)
+
+sns.barplot(data=df,x='Thal',y='Age', hue='Sex')
+
+sns.lineplot(data=df,x='Age',y='ChestPain')
+
+sns.scatterplot(data=df)
+
+sns.countplot(data=df,x='Sex',hue='ChestPain')
+
+sns.displot(data=df,x='Age',color='Red')
+plt.show()
+
+df.hist()
+plt.show()
+
+sns.boxplot(x='Sex',y='Age',data=df)
+plt.show()
+
+sns.scatterplot(data=df,x='Chol',y='Age',hue='Sex')
+plt.show()
+
+sns.pairplot(df)
+plt.show()
+
+colors= ['red', 'green','brown'];
+plt.pie([len('Chol'),len('Ca'),len('Thal')],labels=['cholestrol','caa','thal'],colors=colors,autopct='%1.1f%%')
+plt.legend()
+plt.show()
